@@ -5,16 +5,16 @@ import zipfile
 from datetime import datetime
 import streamlit as st
 
-st.set_page_config(page_title='CSV Icindeki Tirnaklari Kaldir', layout="centered")
+st.set_page_config(page_title="CSV Icindeki Tirnaklari Kaldir", layout="centered")
 st.title('🧹 CSV icindeki " karakterlerini kaldir')
 
 st.markdown("""
-Bu uygulama yukledigin CSV dosyalarinin (veya CSV iceren bir ZIP'in) icindeki **cift tirnak** (`"`) karakterlerini
+Bu uygulama yukledigin CSV dosyalarinin (veya CSV iceren bir ZIP'in) icindeki **cift tirnak** (") karakterlerini
 hucrelerden siler.
 
-- Degisiklik olan dosyalar: `modified_<orijinal_ad>.csv`
+- Degisiklik olan dosyalar: modified_<orijinal_ad>.csv
 - Degisiklik olmayanlar raporda listelenir
-- Sonuclar tek bir ZIP olarak indirilebilir (icinde rapor + tum ciktular)
+- Sonuclar tek bir ZIP olarak indirilebilir (icinde rapor + tum ciktilar)
 """)
 
 source_mode = st.radio(
@@ -25,6 +25,8 @@ source_mode = st.radio(
 
 auto_sniff = st.checkbox("Ayiriciyi otomatik algila (csv.Sniffer)", value=True)
 encoding = st.selectbox("Dosya encoding", ["utf-8", "utf-8-sig", "cp1254", "latin-1"], index=1)
+
+QUOTE_CHAR = '"'  # raporda yazdirmak icin guvenli
 
 def process_csv_bytes(data: bytes, filename: str, *, auto_sniff: bool, encoding: str):
     """
@@ -84,7 +86,7 @@ def build_output_zip(results, report_text: str):
     out.seek(0)
     return out.getvalue()
 
-timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 modified_lines = []
 unchanged_lines = []
@@ -107,7 +109,9 @@ if source_mode == "CSV dosyalari yukle (coklu)":
             output_files.append((out_name, out_bytes))
 
             if modified:
-                modified_lines.append(f"{up.name} dosyasinda {lines_modified} satirda '\\"' karakteri silindi.")
+                modified_lines.append(
+                    f"{up.name} dosyasinda {lines_modified} satirda {QUOTE_CHAR!r} karakteri silindi."
+                )
             else:
                 unchanged_lines.append(f"{up.name} dosyasinda degisiklik yapilmadi.")
 else:
@@ -134,7 +138,9 @@ else:
                 output_files.append((out_name, out_bytes))
 
                 if modified:
-                    modified_lines.append(f"{member_name} dosyasinda {lines_modified} satirda '"' karakteri silindi.")
+                    modified_lines.append(
+                        f"{member_name} dosyasinda {lines_modified} satirda {QUOTE_CHAR!r} karakteri silindi."
+                    )
                 else:
                     unchanged_lines.append(f"{member_name} dosyasinda degisiklik yapilmadi.")
 
@@ -147,7 +153,7 @@ else:
 
 if output_files or errors or modified_lines or unchanged_lines:
     report = []
-    report.append("CSV Dosyalarinda Yapilan Degisiklikler:\n\n")
+    report.append("CSV Dosyalarinda Yapilan Degisiklikler\n\n")
     report.append(f"Zaman: {timestamp}\n")
 
     if modified_lines:
