@@ -107,7 +107,7 @@ if source_mode == "CSV dosyalari yukle (coklu)":
             output_files.append((out_name, out_bytes))
 
             if modified:
-                modified_lines.append(f"{up.name} dosyasinda {lines_modified} satirda '"' karakteri silindi.")
+                modified_lines.append(f"{up.name} dosyasinda {lines_modified} satirda '\\"' karakteri silindi.")
             else:
                 unchanged_lines.append(f"{up.name} dosyasinda degisiklik yapilmadi.")
 else:
